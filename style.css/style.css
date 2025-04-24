@@ -1,0 +1,28 @@
+body {
+    background-color: #f5f5f5;
+    font-family: Arial, sans-serif;
+    color: #333;
+    padding: 30px;
+  }
+  h1 {
+    color: #2c3e50;
+  }
+  h2 {
+    color: #2980b9;
+  }
+  ul {
+    list-style-type: square;
+  }
+
+
+
+  #myVideo {
+    width: 30px;   /* Cambia a lo que tú quieras */
+    height: 30px;   /* Mantiene la proporción del video */
+    display: block;
+    margin: 20px auto; /* Centrado con margen */
+    border: 2px solid black; /* Solo para que veas el tamaño */
+}
+
+
+
