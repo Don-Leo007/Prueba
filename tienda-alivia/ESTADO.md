@@ -1,8 +1,9 @@
 # Estado del proyecto — Alivia
 
-- **Tienda:** pendiente de crear (el dueño crea la cuenta de Shopify con su correo).
+- **Tienda:** a1c70y-yu.myshopify.com (plan de US$1 activo). Tema **Alivia** (#201729114272) subido y **publicado** el 17/11/2026. Horizon queda sin publicar.
 - **Ruta del tema:** `tienda-alivia/tema/` (base: Dawn 16.2.0) · paquete listo: `tienda-alivia/alivia-tema.zip`
-- **Fase completada:** 4 y 5 (construcción + producto/páginas). Falta fase 6 (subir y publicar) cuando exista la tienda.
+- **Fase completada:** 4, 5 y 6 (tema subido y publicado). Pendiente: producto en el catálogo, quitar contraseña, revisar la tienda en vivo.
+- **Conexión:** login del tema hecho desde la sesión en la nube. `shopify store auth` no sirve aquí (redirige a 127.0.0.1 del celular), así que el producto se importa con el CSV desde el panel.
 - **Validación:** `shopify theme check` → 0 errores (solo avisos heredados de Dawn).
 
 ## Producto
@@ -39,7 +40,7 @@
 Otros: `assets/al-styles.css`, `assets/al-scripts.js`, `assets/al-favicon.png`, `snippets/al-icon.liquid`, `snippets/al-ilustracion.liquid`, cambios en `layout/theme.liquid` (favicon, fuentes, estilos) y `config/` (colores, ajustes Alivia).
 
 ## Pendiente (lado del dueño)
-1. Crear cuenta Shopify → subir `alivia-tema.zip` → publicar.
+1. ~~Crear cuenta Shopify → subir tema → publicar~~ ✅ hecho. Cambiar el nombre "Mi tienda" por "Alivia" (sale en la cabecera).
 2. Importar `productos-shopify.csv` y subir fotos del proveedor.
 3. WhatsApp en Configuración del tema.
 4. Pagos manuales (contra entrega + depósito BI), envío gratis Q0, políticas, teléfono obligatorio, quitar contraseña.
