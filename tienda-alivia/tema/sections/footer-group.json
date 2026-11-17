@@ -1,0 +1,31 @@
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "settings": {
+        "tagline": "Bienestar en casa. Masaje shiatsu con calor para soltar la tensión del día, hecho para Guatemala.",
+        "nav_titulo": "Tienda",
+        "nav_1_label": "Inicio",
+        "nav_1_url": "/",
+        "nav_2_label": "Comprar ahora",
+        "nav_2_url": "/products/masajeador-shiatsu-alivia",
+        "nav_3_label": "Contacto",
+        "nav_3_url": "/pages/contact",
+        "nav_4_label": "",
+        "nav_5_label": "",
+        "sobre_titulo": "Compra con confianza",
+        "sobre_texto": "Envíos a los 22 departamentos. Pagas cuando lo recibes. Te atendemos por WhatsApp de lunes a sábado.",
+        "metodos_pago": "Efectivo al recibir, Transferencia, Depósito bancario",
+        "color_fondo": "#12302F",
+        "color_texto": "#FFFBF6",
+        "padding_top": 72,
+        "padding_bottom": 40
+      }
+    }
+  },
+  "order": [
+    "footer"
+  ]
+}

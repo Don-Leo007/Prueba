@@ -1,0 +1,365 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign p = product
+  if p == blank and section.settings.producto_handle != blank
+    assign p = all_products[section.settings.producto_handle]
+  endif
+  if p == blank or p.id == blank
+    assign p = collections.all.products.first
+  endif
+
+  if p != blank and p.id != blank
+    assign tiene_producto = true
+    assign v = p.selected_or_first_available_variant
+  else
+    assign tiene_producto = false
+  endif
+
+  if template.name == 'product'
+    assign tag_titulo = 'h1'
+  else
+    assign tag_titulo = 'h2'
+  endif
+
+  assign wa = settings.al_whatsapp | remove: ' ' | remove: '+' | remove: '-'
+  assign puntos = section.settings.puntos | newline_to_br | split: '<br />'
+  assign incluye = section.settings.incluye | newline_to_br | split: '<br />'
+  assign uso = section.settings.uso | newline_to_br | split: '<br />'
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-compra__titulo { font-size: {{ section.settings.heading_size }}px; text-align: {{ section.settings.text_align }}; }
+  #shopify-section-{{ section.id }} .al-compra__intro,
+  #shopify-section-{{ section.id }} .al-compra__puntos { font-size: {{ section.settings.body_size }}px; }
+  #shopify-section-{{ section.id }} .al-compra__head { text-align: {{ section.settings.text_align }}; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.5 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-compra__titulo { font-size: {{ section.settings.heading_size | times: 0.8 | round }}px; }
+  }
+{% endstyle %}
+
+<section
+  id="comprar"
+  class="al-producto al-section"
+  data-al-producto
+  data-al-money="{{ shop.money_format | escape }}"
+  data-al-soldout="{{ section.settings.texto_agotado | escape }}"
+>
+  <div class="al-container al-producto__grid">
+    {%- comment -%} ---------- Galería ---------- {%- endcomment -%}
+    <div class="al-galeria al-reveal">
+      {%- if tiene_producto and p.media.size > 0 -%}
+        {%- liquid
+          assign primera = v.featured_media | default: p.featured_media
+          if primera.media_type != 'image' and primera.preview_image
+            assign primera = primera.preview_image
+          endif
+        -%}
+        <div class="al-galeria__main">
+          <img
+            data-al-main-img
+            src="{{ primera | image_url: width: 1200 }}"
+            srcset="{{ primera | image_url: width: 600 }} 600w, {{ primera | image_url: width: 900 }} 900w, {{ primera | image_url: width: 1200 }} 1200w"
+            sizes="(min-width: 990px) 50vw, 100vw"
+            width="1200"
+            height="{{ 1200 | divided_by: primera.aspect_ratio | round }}"
+            alt="{{ primera.alt | default: p.title | escape }}"
+            {% if template.name == 'product' %}fetchpriority="high"{% else %}loading="lazy"{% endif %}
+          >
+        </div>
+        {%- if p.media.size > 1 -%}
+          <div class="al-galeria__thumbs">
+            {%- for m in p.media limit: 10 -%}
+              {%- if m.media_type == 'image' or m.preview_image -%}
+                {%- assign img = m.preview_image | default: m -%}
+                <button
+                  type="button"
+                  class="al-galeria__thumb{% if m.id == primera.id %} is-activo{% endif %}"
+                  data-al-thumb
+                  data-media-id="{{ m.id }}"
+                  data-src="{{ img | image_url: width: 1200 }}"
+                  data-srcset="{{ img | image_url: width: 600 }} 600w, {{ img | image_url: width: 900 }} 900w, {{ img | image_url: width: 1200 }} 1200w"
+                  data-alt="{{ img.alt | default: p.title | escape }}"
+                  aria-label="Ver foto {{ forloop.index }}"
+                >
+                  {{ img | image_url: width: 200 | image_tag: loading: 'lazy', alt: '' }}
+                </button>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        <div class="al-galeria__main">{% render 'al-ilustracion', tono: 'claro' %}</div>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%} ---------- Columna de compra ---------- {%- endcomment -%}
+    <div class="al-compra al-reveal" style="--al-i: 1" data-al-buy-zone>
+      <div class="al-compra__head">
+        {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <{{ tag_titulo }} class="al-compra__titulo al-h">
+          {%- if section.settings.titulo != blank -%}{{ section.settings.titulo }}{%- elsif tiene_producto -%}{{ p.title }}{%- else -%}Tu producto{%- endif -%}
+        </{{ tag_titulo }}>
+      </div>
+
+      {%- if tiene_producto -%}
+        <div class="al-compra__precio">
+          <strong data-al-price>{{ v.price | money }}</strong>
+          <s data-al-compare {% unless v.compare_at_price > v.price %}hidden{% endunless %}>{{ v.compare_at_price | money }}</s>
+          <span class="al-compra__ahorro" data-al-save data-al-save-label="{{ section.settings.texto_ahorro | escape }}" {% unless v.compare_at_price > v.price %}hidden{% endunless %}>
+            {{ section.settings.texto_ahorro }} {{ v.compare_at_price | minus: v.price | money }}
+          </span>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.nota_precio != blank -%}<p class="al-compra__nota">{{ section.settings.nota_precio }}</p>{%- endif -%}
+
+      {%- if section.settings.intro != blank -%}<p class="al-compra__intro">{{ section.settings.intro | newline_to_br }}</p>{%- endif -%}
+
+      {%- if puntos.size > 0 -%}
+        <ul class="al-compra__puntos">
+          {%- for t in puntos -%}{%- assign l = t | strip | strip_newlines -%}{%- if l != blank -%}<li>{{ l }}</li>{%- endif -%}{%- endfor -%}
+        </ul>
+      {%- endif -%}
+
+      {%- if tiene_producto -%}
+        {%- form 'product', p, id: 'al-form-producto', novalidate: 'novalidate' -%}
+          <input type="hidden" name="id" value="{{ v.id }}">
+
+          {%- unless p.has_only_default_variant -%}
+            {%- for option in p.options_with_values -%}
+              {%- assign idx = forloop.index0 -%}
+              <fieldset class="al-variantes" data-al-option-group style="border: 0; padding: 0; margin: 0 0 18px">
+                <legend class="al-variantes__label" style="margin-bottom: 10px">{{ option.name }}</legend>
+                <div class="al-variantes__opciones">
+                  {%- for value in option.values -%}
+                    {%- liquid
+                      assign precio_op = blank
+                      assign comparar_op = blank
+                      if p.options.size == 1
+                        for var in p.variants
+                          if var.option1 == value
+                            assign precio_op = var.price
+                            assign comparar_op = var.compare_at_price
+                          endif
+                        endfor
+                      endif
+                    -%}
+                    <label class="al-opcion">
+                      <input
+                        type="radio"
+                        name="al-opt-{{ section.id }}-{{ idx }}"
+                        value="{{ value | escape }}"
+                        {% if option.selected_value == value %}checked{% endif %}
+                      >
+                      <span class="al-opcion__caja">
+                        <span class="al-opcion__nombre">{{ value }}</span>
+                        {%- if precio_op != blank -%}
+                          <span>
+                            {%- if comparar_op > precio_op -%}<s style="opacity: .5; font-weight: 500; margin-right: 6px">{{ comparar_op | money }}</s>{%- endif -%}
+                            {{ precio_op | money }}
+                          </span>
+                        {%- endif -%}
+                      </span>
+                    </label>
+                  {%- endfor -%}
+                </div>
+              </fieldset>
+            {%- endfor -%}
+          {%- endunless -%}
+
+          {%- if section.settings.mostrar_cantidad -%}
+            <div class="al-cantidad">
+              <span class="al-variantes__label">{{ section.settings.texto_cantidad }}</span>
+              <div class="al-cantidad__ctrl">
+                <button type="button" data-al-qty-btn="menos" aria-label="Menos">−</button>
+                <input type="number" name="quantity" value="1" min="1" max="99" data-al-qty aria-label="{{ section.settings.texto_cantidad | escape }}">
+                <button type="button" data-al-qty-btn="mas" aria-label="Más">+</button>
+              </div>
+            </div>
+          {%- endif -%}
+
+          <button
+            type="submit"
+            class="al-btn al-btn--full"
+            data-al-buy
+            {% if section.settings.ir_directo_pago %}name="return_to" value="/checkout"{% endif %}
+            {% unless v.available %}disabled{% endunless %}
+          >
+            {%- if v.available -%}
+              {% render 'al-icon', nombre: 'efectivo' %}{{ section.settings.boton_texto }}
+            {%- else -%}
+              {{ section.settings.texto_agotado }}
+            {%- endif -%}
+          </button>
+
+          {%- if section.settings.mostrar_carrito -%}
+            <button type="submit" class="al-btn al-btn--ghost al-btn--full al-compra__secundario" name="return_to" value="/cart" data-al-buy {% unless v.available %}disabled{% endunless %}>
+              {{ section.settings.boton_carrito }}
+            </button>
+          {%- endif -%}
+        {%- endform -%}
+
+        {%- if wa != blank and section.settings.boton_whatsapp != blank -%}
+          {%- capture mensaje_wa -%}{{ section.settings.mensaje_whatsapp }} {{ p.title }} ({{ v.price | money_without_trailing_zeros | strip_html }}){%- endcapture -%}
+          <a class="al-btn al-btn--full al-compra__whatsapp" href="https://wa.me/{{ wa }}?text={{ mensaje_wa | url_encode }}" target="_blank" rel="noopener">
+            {% render 'al-icon', nombre: 'whatsapp' %}{{ section.settings.boton_whatsapp }}
+          </a>
+        {%- endif -%}
+
+        <script type="application/json" data-al-variants>
+          [
+            {%- for var in p.variants -%}
+              {
+                "id": {{ var.id }},
+                "price": {{ var.price }},
+                "compare_at_price": {{ var.compare_at_price | default: 0 }},
+                "available": {{ var.available }},
+                "options": {{ var.options | json }},
+                "featured_media_id": {{ var.featured_media.id | default: 'null' }}
+              }{% unless forloop.last %},{% endunless %}
+            {%- endfor -%}
+          ]
+        </script>
+      {%- else -%}
+        {%- if request.design_mode -%}
+          <p class="al-compra__nota">Todavía no hay ningún producto en tu tienda. Crea o importa tu producto (Panel → Productos) y aquí aparecerán su precio y el botón de compra.</p>
+        {%- endif -%}
+      {%- endif -%}
+
+      <div class="al-confianza">
+        <div class="al-confianza__item">{% render 'al-icon', nombre: 'efectivo' %}{{ section.settings.confianza_1 }}</div>
+        <div class="al-confianza__item">{% render 'al-icon', nombre: 'envio' %}{{ section.settings.confianza_2 }}</div>
+        <div class="al-confianza__item">{% render 'al-icon', nombre: 'garantia' %}{{ section.settings.confianza_3 }}</div>
+      </div>
+
+      <div class="al-compra__acordeon">
+        {%- if section.settings.mostrar_descripcion and tiene_producto and p.description != blank -%}
+          <details>
+            <summary>{{ section.settings.titulo_descripcion }}</summary>
+            <div class="al-rte">{{ p.description }}</div>
+          </details>
+        {%- endif -%}
+        {%- if section.settings.incluye != blank -%}
+          <details>
+            <summary>{{ section.settings.titulo_incluye }}</summary>
+            <div class="al-rte">
+              <ul>
+                {%- for t in incluye -%}{%- assign l = t | strip | strip_newlines -%}{%- if l != blank -%}<li>{{ l }}</li>{%- endif -%}{%- endfor -%}
+              </ul>
+            </div>
+          </details>
+        {%- endif -%}
+        {%- if section.settings.uso != blank -%}
+          <details>
+            <summary>{{ section.settings.titulo_uso }}</summary>
+            <div class="al-rte">
+              <ol>
+                {%- for t in uso -%}{%- assign l = t | strip | strip_newlines -%}{%- if l != blank -%}<li>{{ l }}</li>{%- endif -%}{%- endfor -%}
+              </ol>
+            </div>
+          </details>
+        {%- endif -%}
+        {%- if section.settings.envios != blank -%}
+          <details>
+            <summary>{{ section.settings.titulo_envios }}</summary>
+            <div class="al-rte">{{ section.settings.envios }}</div>
+          </details>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- if tiene_producto and section.settings.barra_movil -%}
+  <div class="al-sticky-bar" data-al-sticky-bar>
+    <div class="al-sticky-bar__info">
+      <small>{{ p.title }}</small>
+      <strong data-al-sticky-price>{{ v.price | money }}</strong>
+    </div>
+    <button type="button" class="al-btn" data-al-sticky-buy {% unless v.available %}disabled{% endunless %}>{{ section.settings.boton_barra }}</button>
+  </div>
+{%- endif -%}
+
+{%- if tiene_producto and template.name == 'product' -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": {{ p.title | json }},
+  "description": {{ p.description | strip_html | truncate: 500 | json }},
+  {%- if p.featured_image -%}"image": [{{ p.featured_image | image_url: width: 1200 | prepend: 'https:' | json }}],{%- endif -%}
+  "brand": { "@type": "Brand", "name": {{ p.vendor | json }} },
+  "offers": [
+    {%- for var in p.variants -%}
+    {
+      "@type": "Offer",
+      "name": {{ var.title | json }},
+      "price": {{ var.price | divided_by: 100.0 | json }},
+      "priceCurrency": {{ cart.currency.iso_code | json }},
+      "availability": "https://schema.org/{% if var.available %}InStock{% else %}OutOfStock{% endif %}",
+      "url": {{ request.origin | append: var.url | json }}
+    }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Alivia – Producto",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "producto_handle", "label": "Identificador del producto (handle)", "info": "Solo se usa fuera de la página de producto (por ejemplo, en la portada).", "default": "masajeador-shiatsu-alivia" },
+    { "type": "header", "content": "Textos" },
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "Masaje shiatsu con calor" },
+    { "type": "text", "id": "titulo", "label": "Título (vacío = nombre del producto)" },
+    { "type": "text", "id": "nota_precio", "label": "Nota bajo el precio", "default": "Envío gratis · Pagas en efectivo cuando lo recibes" },
+    { "type": "text", "id": "texto_ahorro", "label": "Texto del ahorro", "default": "Ahorras" },
+    { "type": "textarea", "id": "intro", "label": "Introducción", "default": "Siente un masaje profundo, como el de unas manos expertas, con calor relajante. Para cuello, hombros, espalda, cintura y piernas." },
+    { "type": "textarea", "id": "puntos", "label": "Puntos clave (uno por línea)", "default": "8 cabezales que giran y amasan en 3D\nCalor suave que relaja los músculos\n3 intensidades y cambio de dirección\nApagado automático a los 15 minutos\nAdaptador para casa y para carro" },
+    { "type": "header", "content": "Compra" },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón principal", "default": "Pedir ahora · Pago al recibir" },
+    { "type": "checkbox", "id": "ir_directo_pago", "label": "El botón principal lleva directo a finalizar compra", "info": "Recomendado para una tienda de un solo producto.", "default": true },
+    { "type": "checkbox", "id": "mostrar_carrito", "label": "Mostrar botón secundario «Agregar al carrito»", "default": false },
+    { "type": "text", "id": "boton_carrito", "label": "Texto del botón secundario", "default": "Agregar al carrito" },
+    { "type": "checkbox", "id": "mostrar_cantidad", "label": "Mostrar selector de cantidad", "default": false },
+    { "type": "text", "id": "texto_cantidad", "label": "Texto de cantidad", "default": "Cantidad" },
+    { "type": "text", "id": "texto_agotado", "label": "Texto cuando está agotado", "default": "Agotado por ahora" },
+    { "type": "text", "id": "boton_whatsapp", "label": "Botón de WhatsApp", "info": "Necesita el número en Configuración del tema → Alivia. Vacío = sin botón.", "default": "Pedir por WhatsApp" },
+    { "type": "text", "id": "mensaje_whatsapp", "label": "Mensaje que se escribe solo en WhatsApp", "default": "Hola, quiero pedir el" },
+    { "type": "checkbox", "id": "barra_movil", "label": "Barra fija de compra en el celular", "default": true },
+    { "type": "text", "id": "boton_barra", "label": "Texto del botón de la barra", "default": "Pedir ahora" },
+    { "type": "header", "content": "Fila de confianza" },
+    { "type": "text", "id": "confianza_1", "label": "Punto 1", "default": "Pago contra entrega" },
+    { "type": "text", "id": "confianza_2", "label": "Punto 2", "default": "Envío gratis 1–5 días" },
+    { "type": "text", "id": "confianza_3", "label": "Punto 3", "default": "Garantía 30 días" },
+    { "type": "header", "content": "Pestañas de información" },
+    { "type": "checkbox", "id": "mostrar_descripcion", "label": "Mostrar la descripción del producto", "default": true },
+    { "type": "text", "id": "titulo_descripcion", "label": "Título – descripción", "default": "Descripción" },
+    { "type": "text", "id": "titulo_incluye", "label": "Título – qué incluye", "default": "Qué incluye la caja" },
+    { "type": "textarea", "id": "incluye", "label": "Qué incluye (uno por línea)", "default": "1 masajeador Alivia\n1 adaptador de corriente para casa\n1 adaptador para el carro\nManual de uso" },
+    { "type": "text", "id": "titulo_uso", "label": "Título – cómo se usa", "default": "Cómo se usa" },
+    { "type": "textarea", "id": "uso", "label": "Pasos (uno por línea)", "default": "Colócalo sobre el cuello, hombros o la zona que quieras\nPasa los brazos por las asas y ajusta la presión a tu gusto\nEnciéndelo y elige intensidad y calor\nRelájate 15 minutos: se apaga solo" },
+    { "type": "text", "id": "titulo_envios", "label": "Título – envíos y pagos", "default": "Envíos y pagos" },
+    { "type": "richtext", "id": "envios", "label": "Texto de envíos y pagos", "default": "<p><strong>Envío gratis a toda Guatemala.</strong> Ciudad capital: 1–3 días hábiles. Departamentos: 2–5 días hábiles.</p><p><strong>Pagas al recibir</strong> en efectivo. También puedes pagar por transferencia o depósito.</p>" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" } ], "default": "left" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 64, "step": 2, "unit": "px", "default": 40 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 22, "step": 1, "unit": "px", "default": 17 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#FFFBF6" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 48 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 88 }
+  ],
+  "presets": [ { "name": "Alivia – Producto" } ]
+}
+{% endschema %}

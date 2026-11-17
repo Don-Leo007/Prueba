@@ -1,0 +1,163 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign p = product
+  if p == blank and section.settings.producto_handle != blank
+    assign p = all_products[section.settings.producto_handle]
+  endif
+  if p == blank or p.id == blank
+    assign p = collections.all.products.first
+  endif
+
+  assign enlace = section.settings.boton_link
+  if enlace == blank
+    if p != blank and p.url != blank
+      assign enlace = p.url
+    else
+      assign enlace = '#comprar'
+    endif
+  endif
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: linear-gradient(180deg, {{ section.settings.color_fondo }} 0%, {{ section.settings.color_fondo_2 }} 100%);
+  }
+  #shopify-section-{{ section.id }} .al-hero__title {
+    font-size: {{ section.settings.heading_size }}px;
+    text-align: {{ section.settings.text_align }};
+  }
+  #shopify-section-{{ section.id }} .al-hero__sub {
+    font-size: {{ section.settings.body_size }}px;
+    text-align: {{ section.settings.text_align }};
+    line-height: 1.6;
+  }
+  #shopify-section-{{ section.id }} .al-hero__copy { text-align: {{ section.settings.text_align }}; }
+  {%- if section.settings.text_align == 'center' -%}
+    #shopify-section-{{ section.id }} .al-hero__ctas,
+    #shopify-section-{{ section.id }} .al-chips { justify-content: center; }
+    #shopify-section-{{ section.id }} .al-hero__sub { margin-left: auto; margin-right: auto; }
+  {%- endif -%}
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} {
+      padding-top: {{ section.settings.padding_top | times: 0.6 | round }}px;
+      padding-bottom: {{ section.settings.padding_bottom | times: 0.6 | round }}px;
+    }
+    #shopify-section-{{ section.id }} .al-hero__title { font-size: {{ section.settings.heading_size | times: 0.68 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="al-hero al-section" aria-label="{{ section.settings.titulo | strip_html | escape }}">
+  <div class="al-container al-hero__grid">
+    <div class="al-hero__copy">
+      {%- if section.settings.badge_texto != blank -%}
+        <div class="al-hero__badge al-reveal">
+          {%- if section.settings.badge_num != blank -%}<span>{{ section.settings.badge_num }}</span>{%- endif -%}
+          {{ section.settings.badge_texto }}
+        </div>
+      {%- endif -%}
+      <h1 class="al-hero__title al-reveal" style="--al-i: 1">{{ section.settings.titulo }}</h1>
+      {%- if section.settings.subtitulo != blank -%}
+        <p class="al-hero__sub al-muted al-reveal" style="--al-i: 2">{{ section.settings.subtitulo | newline_to_br }}</p>
+      {%- endif -%}
+
+      <div class="al-hero__ctas al-reveal" style="--al-i: 3">
+        {%- if section.settings.boton_texto != blank -%}
+          <a class="al-btn" href="{{ enlace }}">
+            {{ section.settings.boton_texto }}
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        {%- endif -%}
+        {%- if section.settings.mostrar_precio and p != blank and p.price != blank -%}
+          <div class="al-hero__price">
+            <strong>{{ p.price_min | money }}</strong>
+            {%- if section.settings.precio_nota != blank -%}<small>{{ section.settings.precio_nota }}</small>{%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      <ul class="al-chips al-reveal" style="--al-i: 4">
+        {%- if section.settings.chip_1 != blank -%}<li class="al-chip">{% render 'al-icon', nombre: 'efectivo' %}{{ section.settings.chip_1 }}</li>{%- endif -%}
+        {%- if section.settings.chip_2 != blank -%}<li class="al-chip">{% render 'al-icon', nombre: 'envio' %}{{ section.settings.chip_2 }}</li>{%- endif -%}
+        {%- if section.settings.chip_3 != blank -%}<li class="al-chip">{% render 'al-icon', nombre: 'garantia' %}{{ section.settings.chip_3 }}</li>{%- endif -%}
+      </ul>
+    </div>
+
+    <div class="al-hero__visual al-reveal" style="--al-i: 2">
+      <div class="al-hero__blob" aria-hidden="true"></div>
+      {%- if section.settings.imagen != blank -%}
+        <div class="al-hero__img" data-al-parallax="{{ section.settings.parallax }}">
+          {{ section.settings.imagen | image_url: width: 1400 | image_tag: loading: 'eager', fetchpriority: 'high', sizes: '(min-width: 990px) 50vw, 100vw', widths: '500, 800, 1100, 1400' }}
+        </div>
+      {%- elsif p != blank and p.featured_image != blank -%}
+        <div class="al-hero__img" data-al-parallax="{{ section.settings.parallax }}">
+          {{ p.featured_image | image_url: width: 1400 | image_tag: loading: 'eager', fetchpriority: 'high', sizes: '(min-width: 990px) 50vw, 100vw', widths: '500, 800, 1100, 1400', alt: p.title }}
+        </div>
+      {%- else -%}
+        <div class="al-hero__img al-hero__img--ilus" data-al-parallax="{{ section.settings.parallax }}">
+          {% render 'al-ilustracion', tono: 'claro' %}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.float_a_titulo != blank -%}
+        <div class="al-hero__float al-hero__float--a">
+          <i aria-hidden="true">{{ section.settings.float_a_emoji }}</i>
+          <div>{{ section.settings.float_a_titulo }}<small>{{ section.settings.float_a_texto }}</small></div>
+        </div>
+      {%- endif -%}
+      {%- if section.settings.float_b_titulo != blank -%}
+        <div class="al-hero__float al-hero__float--b">
+          <i aria-hidden="true">{{ section.settings.float_b_emoji }}</i>
+          <div>{{ section.settings.float_b_titulo }}<small>{{ section.settings.float_b_texto }}</small></div>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – Portada (hero)",
+  "tag": "div",
+  "class": "al-wrap",
+  "settings": [
+    { "type": "header", "content": "Producto" },
+    { "type": "text", "id": "producto_handle", "label": "Identificador del producto (handle)", "info": "Se usa para mostrar la foto y el precio. Lo ves al final del enlace del producto: /products/ESTO", "default": "masajeador-shiatsu-alivia" },
+    { "type": "header", "content": "Textos" },
+    { "type": "text", "id": "badge_num", "label": "Etiqueta pequeña", "default": "NUEVO" },
+    { "type": "text", "id": "badge_texto", "label": "Texto de la etiqueta", "default": "Edición Navidad 2026" },
+    { "type": "inline_richtext", "id": "titulo", "label": "Título", "info": "Pon en cursiva una parte para que salga destacada en color.", "default": "Tu cuello <em>te lo va a agradecer</em>" },
+    { "type": "textarea", "id": "subtitulo", "label": "Subtítulo", "default": "Masaje shiatsu con calor en casa, la oficina o el carro. 15 minutos al día para soltar la tensión del cuello, hombros y espalda." },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Lo quiero" },
+    { "type": "url", "id": "boton_link", "label": "Enlace del botón", "info": "Si lo dejas vacío, lleva a la página del producto." },
+    { "type": "checkbox", "id": "mostrar_precio", "label": "Mostrar precio junto al botón", "default": true },
+    { "type": "text", "id": "precio_nota", "label": "Nota bajo el precio", "default": "Pagas al recibir" },
+    { "type": "text", "id": "chip_1", "label": "Garantía 1", "default": "Pago contra entrega" },
+    { "type": "text", "id": "chip_2", "label": "Garantía 2", "default": "Envío gratis a toda Guatemala" },
+    { "type": "text", "id": "chip_3", "label": "Garantía 3", "default": "Garantía de 30 días" },
+    { "type": "header", "content": "Imagen" },
+    { "type": "image_picker", "id": "imagen", "label": "Imagen principal", "info": "Si no eliges ninguna, se usa la primera foto del producto." },
+    { "type": "range", "id": "parallax", "label": "Movimiento de la imagen al hacer scroll", "min": 0, "max": 20, "step": 1, "default": 6 },
+    { "type": "text", "id": "float_a_emoji", "label": "Tarjeta flotante 1 – icono (emoji)", "default": "🔥" },
+    { "type": "text", "id": "float_a_titulo", "label": "Tarjeta flotante 1 – título", "default": "Calor relajante" },
+    { "type": "text", "id": "float_a_texto", "label": "Tarjeta flotante 1 – texto", "default": "Se activa con un botón" },
+    { "type": "text", "id": "float_b_emoji", "label": "Tarjeta flotante 2 – icono (emoji)", "default": "🚗" },
+    { "type": "text", "id": "float_b_titulo", "label": "Tarjeta flotante 2 – título", "default": "Casa, oficina o carro" },
+    { "type": "text", "id": "float_b_texto", "label": "Tarjeta flotante 2 – texto", "default": "Úsalo donde quieras" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "left" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 28, "max": 96, "step": 2, "unit": "px", "default": 64 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 14, "max": 26, "step": 1, "unit": "px", "default": 19 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo (arriba)", "default": "#FFFBF6" },
+    { "type": "color", "id": "color_fondo_2", "label": "Fondo (abajo)", "default": "#F6F0E8" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 88 }
+  ],
+  "presets": [ { "name": "Alivia – Portada (hero)" } ]
+}
+{% endschema %}

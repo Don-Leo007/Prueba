@@ -1,0 +1,133 @@
+{%- comment -%}
+  Pie de página de Alivia (reescrito para que sea sencillo de editar).
+{%- endcomment -%}
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+    color: {{ section.settings.color_texto }};
+    --al-text: {{ section.settings.color_texto }};
+  }
+  #shopify-section-{{ section.id }} .al-footer__tagline,
+  #shopify-section-{{ section.id }} .al-footer__nav,
+  #shopify-section-{{ section.id }} .al-footer__sobre { font-size: {{ section.settings.text_size }}px; }
+  #shopify-section-{{ section.id }} .al-footer h3 { color: {{ section.settings.color_texto }}; }
+{% endstyle %}
+
+{%- liquid
+  assign wa = settings.al_whatsapp | remove: ' ' | remove: '+' | remove: '-'
+  assign metodos = section.settings.metodos_pago | split: ','
+-%}
+
+<footer class="al-footer al-section">
+  <div class="al-container">
+    <div class="al-footer__grid">
+      <div>
+        <a href="{{ routes.root_url }}" class="al-footer__marca" style="opacity: 1; text-decoration: none">
+          {%- if section.settings.logo != blank -%}
+            {{ section.settings.logo | image_url: width: 600 | image_tag: width: section.settings.logo_width, loading: 'lazy', alt: shop.name }}
+          {%- else -%}
+            {{ shop.name }}
+          {%- endif -%}
+        </a>
+        {%- if section.settings.tagline != blank -%}<p class="al-footer__tagline">{{ section.settings.tagline | newline_to_br }}</p>{%- endif -%}
+        {%- if section.settings.mostrar_redes -%}
+          <ul class="al-footer__social">
+            {%- if settings.social_facebook_link != blank -%}<li><a href="{{ settings.social_facebook_link }}" target="_blank" rel="noopener" aria-label="Facebook">{% render 'al-icon', nombre: 'facebook' %}</a></li>{%- endif -%}
+            {%- if settings.social_instagram_link != blank -%}<li><a href="{{ settings.social_instagram_link }}" target="_blank" rel="noopener" aria-label="Instagram">{% render 'al-icon', nombre: 'instagram' %}</a></li>{%- endif -%}
+            {%- if settings.social_tiktok_link != blank -%}<li><a href="{{ settings.social_tiktok_link }}" target="_blank" rel="noopener" aria-label="TikTok">{% render 'al-icon', nombre: 'tiktok' %}</a></li>{%- endif -%}
+            {%- if wa != blank -%}<li><a href="https://wa.me/{{ wa }}" target="_blank" rel="noopener" aria-label="WhatsApp">{% render 'al-icon', nombre: 'whatsapp' %}</a></li>{%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      <div>
+        {%- if section.settings.nav_titulo != blank -%}<h3>{{ section.settings.nav_titulo }}</h3>{%- endif -%}
+        <ul class="al-footer__nav">
+          {%- for i in (1..5) -%}
+            {%- assign k_label = 'nav_' | append: i | append: '_label' -%}
+            {%- assign k_url = 'nav_' | append: i | append: '_url' -%}
+            {%- if section.settings[k_label] != blank -%}
+              <li><a href="{{ section.settings[k_url] | default: '#' }}">{{ section.settings[k_label] }}</a></li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      </div>
+
+      <div>
+        {%- if section.settings.sobre_titulo != blank -%}<h3>{{ section.settings.sobre_titulo }}</h3>{%- endif -%}
+        {%- if section.settings.sobre_texto != blank -%}<p class="al-footer__sobre" style="opacity: .8; line-height: 1.6">{{ section.settings.sobre_texto | newline_to_br }}</p>{%- endif -%}
+        {%- if shop.email != blank and section.settings.mostrar_email -%}
+          <p class="al-footer__sobre" style="margin-top: 12px"><a href="mailto:{{ shop.email }}">{{ shop.email }}</a></p>
+        {%- endif -%}
+        {%- if metodos.size > 0 -%}
+          <div class="al-footer__metodos">
+            {%- for m in metodos -%}{%- assign l = m | strip -%}{%- if l != blank -%}<span>{{ l }}</span>{%- endif -%}{%- endfor -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    <div class="al-footer__bottom">
+      <p>© {{ 'now' | date: '%Y' }} {{ shop.name }}. {{ section.settings.copyright }}</p>
+      <ul class="al-footer__legal">
+        {%- for policy in shop.policies -%}
+          {%- if policy != blank -%}<li><a href="{{ policy.url }}">{{ policy.title }}</a></li>{%- endif -%}
+        {%- endfor -%}
+      </ul>
+      {%- if section.settings.mostrar_iconos_pago and shop.enabled_payment_types.size > 0 -%}
+        <ul class="al-footer__pagos">
+          {%- for type in shop.enabled_payment_types -%}<li>{{ type | payment_type_svg_tag: class: 'icon icon--full-color' }}</li>{%- endfor -%}
+        </ul>
+      {%- endif -%}
+    </div>
+  </div>
+</footer>
+
+{%- if wa != blank and settings.al_whatsapp_flotante -%}
+  <a class="al-wa" href="https://wa.me/{{ wa }}?text={{ settings.al_whatsapp_mensaje | url_encode }}" target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+    {% render 'al-icon', nombre: 'whatsapp' %}
+  </a>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Alivia – Pie de página",
+  "tag": "div",
+  "settings": [
+    { "type": "header", "content": "Marca" },
+    { "type": "image_picker", "id": "logo", "label": "Logo (vacío = nombre de la tienda)" },
+    { "type": "range", "id": "logo_width", "label": "Ancho del logo (px)", "min": 60, "max": 300, "step": 10, "unit": "px", "default": 150 },
+    { "type": "textarea", "id": "tagline", "label": "Frase de la marca", "default": "Bienestar en casa. Masaje shiatsu con calor para soltar la tensión del día, hecho para Guatemala." },
+    { "type": "checkbox", "id": "mostrar_redes", "label": "Mostrar redes sociales", "info": "Los enlaces se ponen en Configuración del tema → Redes sociales.", "default": true },
+    { "type": "header", "content": "Enlaces" },
+    { "type": "text", "id": "nav_titulo", "label": "Título de la columna", "default": "Tienda" },
+    { "type": "text", "id": "nav_1_label", "label": "Enlace 1 – texto", "default": "Inicio" },
+    { "type": "url", "id": "nav_1_url", "label": "Enlace 1 – destino" },
+    { "type": "text", "id": "nav_2_label", "label": "Enlace 2 – texto", "default": "Comprar" },
+    { "type": "url", "id": "nav_2_url", "label": "Enlace 2 – destino" },
+    { "type": "text", "id": "nav_3_label", "label": "Enlace 3 – texto", "default": "Contacto" },
+    { "type": "url", "id": "nav_3_url", "label": "Enlace 3 – destino" },
+    { "type": "text", "id": "nav_4_label", "label": "Enlace 4 – texto", "default": "Rastrear mi pedido" },
+    { "type": "url", "id": "nav_4_url", "label": "Enlace 4 – destino" },
+    { "type": "text", "id": "nav_5_label", "label": "Enlace 5 – texto" },
+    { "type": "url", "id": "nav_5_url", "label": "Enlace 5 – destino" },
+    { "type": "header", "content": "Sobre la tienda" },
+    { "type": "text", "id": "sobre_titulo", "label": "Título", "default": "Compra con confianza" },
+    { "type": "textarea", "id": "sobre_texto", "label": "Texto", "default": "Envíos a los 22 departamentos. Pagas cuando lo recibes. Te atendemos por WhatsApp de lunes a sábado." },
+    { "type": "checkbox", "id": "mostrar_email", "label": "Mostrar el correo de la tienda", "default": true },
+    { "type": "text", "id": "metodos_pago", "label": "Formas de pago (separadas por comas)", "default": "Efectivo al recibir, Transferencia, Depósito bancario" },
+    { "type": "checkbox", "id": "mostrar_iconos_pago", "label": "Mostrar iconos de tarjetas (si las aceptas)", "default": true },
+    { "type": "text", "id": "copyright", "label": "Texto final", "default": "Todos los derechos reservados." },
+    { "type": "header", "content": "Estilo" },
+    { "type": "range", "id": "text_size", "label": "Tamaño del texto (px)", "min": 12, "max": 20, "step": 1, "unit": "px", "default": 15 },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#12302F" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#FFFBF6" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 72 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 40 }
+  ]
+}
+{% endschema %}

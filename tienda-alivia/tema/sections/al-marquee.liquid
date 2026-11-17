@@ -1,0 +1,46 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+    color: {{ section.settings.color_texto }};
+    --al-text: {{ section.settings.color_texto }};
+  }
+  #shopify-section-{{ section.id }} .al-marquee__item { font-size: {{ section.settings.text_size }}px; }
+  #shopify-section-{{ section.id }} .al-marquee__track { --al-marquee-speed: {{ section.settings.velocidad }}s; }
+{% endstyle %}
+
+{%- liquid
+  assign items = section.settings.textos | newline_to_br | split: '<br />'
+-%}
+<div class="al-marquee al-section" role="region" aria-label="{{ items | join: ' · ' | strip_html | strip_newlines | escape }}">
+  <div class="al-marquee__track" aria-hidden="true">
+    {%- for n in (1..4) -%}
+      {%- for t in items -%}
+        {%- assign limpio = t | strip | strip_newlines -%}
+        {%- if limpio != blank -%}<span class="al-marquee__item">{{ limpio }}</span>{%- endif -%}
+      {%- endfor -%}
+    {%- endfor -%}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Alivia – Cinta animada",
+  "tag": "div",
+  "settings": [
+    { "type": "textarea", "id": "textos", "label": "Frases (una por línea)", "default": "🚚 Envío GRATIS a toda Guatemala\n💵 Pagas cuando lo recibes\n🛡️ Garantía de 30 días\n🎁 El regalo perfecto para esta Navidad\n💬 Atención por WhatsApp" },
+    { "type": "range", "id": "velocidad", "label": "Duración de una vuelta (segundos)", "info": "Más segundos = más lento", "min": 10, "max": 90, "step": 5, "unit": "s", "default": 40 },
+    { "type": "range", "id": "text_size", "label": "Tamaño del texto (px)", "min": 12, "max": 28, "step": 1, "unit": "px", "default": 16 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#12302F" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#FFFBF6" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 16 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 80, "step": 2, "unit": "px", "default": 16 }
+  ],
+  "presets": [ { "name": "Alivia – Cinta animada" } ]
+}
+{% endschema %}

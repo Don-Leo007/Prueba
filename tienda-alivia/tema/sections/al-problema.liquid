@@ -1,0 +1,66 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; text-align: {{ section.settings.text_align }}; }
+  #shopify-section-{{ section.id }} .al-problema__intro { font-size: {{ section.settings.body_size }}px; text-align: {{ section.settings.text_align }}; line-height: 1.6; margin-top: 16px; }
+  #shopify-section-{{ section.id }} .al-problema__item { font-size: {{ section.settings.body_size }}px; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+{%- assign dolores = section.settings.lista | newline_to_br | split: '<br />' -%}
+<section class="al-problema al-section">
+  <div class="al-container al-problema__grid">
+    <div class="al-reveal" style="text-align: {{ section.settings.text_align }}">
+      {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.intro != blank -%}<p class="al-problema__intro al-muted">{{ section.settings.intro | newline_to_br }}</p>{%- endif -%}
+    </div>
+    <div>
+      <ul class="al-problema__list">
+        {%- for d in dolores -%}
+          {%- assign limpio = d | strip | strip_newlines -%}
+          {%- if limpio != blank -%}
+            <li class="al-problema__item al-reveal" style="--al-i: {{ forloop.index }}"><b aria-hidden="true">{{ section.settings.icono }}</b><span>{{ limpio }}</span></li>
+          {%- endif -%}
+        {%- endfor -%}
+      </ul>
+      {%- if section.settings.cierre != blank -%}
+        <p class="al-problema__cierre al-reveal" style="--al-i: 5">{{ section.settings.cierre }}</p>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – El problema",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "¿Te suena?" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "La tensión del día se acumula justo aquí" },
+    { "type": "textarea", "id": "intro", "label": "Texto", "default": "Horas frente a la computadora, el tráfico, el celular, el estrés… Todo termina en el cuello y los hombros." },
+    { "type": "text", "id": "icono", "label": "Icono de la lista (emoji o símbolo)", "default": "!" },
+    { "type": "textarea", "id": "lista", "label": "Molestias (una por línea)", "default": "Llegas a casa con el cuello rígido y los hombros cargados\nTe cuesta relajarte y dormir bien después del trabajo\nManejar en el tráfico te deja la espalda adolorida\nUn masaje profesional cuesta Q200–Q300 cada vez y no tienes tiempo" },
+    { "type": "text", "id": "cierre", "label": "Frase final destacada", "default": "Alivia te da ese masaje en casa, cuando tú quieras, por menos de lo que cuestan dos sesiones." },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "left" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 46 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 24, "step": 1, "unit": "px", "default": 17 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#F6F0E8" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [ { "name": "Alivia – El problema" } ]
+}
+{% endschema %}

@@ -1,0 +1,91 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-compara__head { text-align: {{ section.settings.text_align }}; max-width: 760px; margin: 0 auto; }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-compara__list { font-size: {{ section.settings.body_size }}px; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+{%- liquid
+  assign lista_a = section.settings.lista_otro | newline_to_br | split: '<br />'
+  assign lista_b = section.settings.lista_marca | newline_to_br | split: '<br />'
+-%}
+<section class="al-compara al-section">
+  <div class="al-container">
+    <div class="al-compara__head al-reveal{% if section.settings.text_align == 'center' %} al-text-center{% endif %}">
+      {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+    </div>
+    <div class="al-compara__grid">
+      <div class="al-compara__col al-reveal" style="--al-i: 1">
+        <h3>{{ section.settings.otro_titulo }}</h3>
+        <div class="al-compara__precio">{{ section.settings.otro_precio }} <small>{{ section.settings.otro_precio_nota }}</small></div>
+        <ul class="al-compara__list">
+          {%- for t in lista_a -%}{%- assign l = t | strip | strip_newlines -%}{%- if l != blank -%}<li>{{ l }}</li>{%- endif -%}{%- endfor -%}
+        </ul>
+      </div>
+      <div class="al-compara__col al-compara__col--marca al-reveal" style="--al-i: 2" data-etiqueta="{{ section.settings.marca_etiqueta | escape }}">
+        <h3>{{ section.settings.marca_titulo }}</h3>
+        <div class="al-compara__precio">{{ section.settings.marca_precio }} <small>{{ section.settings.marca_precio_nota }}</small></div>
+        <ul class="al-compara__list">
+          {%- for t in lista_b -%}{%- assign l = t | strip | strip_newlines -%}{%- if l != blank -%}<li>{{ l }}</li>{%- endif -%}{%- endfor -%}
+        </ul>
+      </div>
+    </div>
+    {%- if section.settings.ahorro_texto != blank -%}
+      <div class="al-compara__ahorro al-reveal" style="--al-i: 3">
+        <span>{{ section.settings.ahorro_texto }}</span>
+        <strong data-al-countup="{{ section.settings.ahorro_numero }}" data-al-prefix="{{ section.settings.ahorro_prefijo | escape }}" data-al-suffix="{{ section.settings.ahorro_sufijo | escape }}">{{ section.settings.ahorro_prefijo }}{{ section.settings.ahorro_numero }}{{ section.settings.ahorro_sufijo }}</strong>
+        <span>{{ section.settings.ahorro_texto_2 }}</span>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – Comparativa",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "Haz cuentas" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Se paga solo desde el segundo masaje" },
+    { "type": "header", "content": "Columna 1 (la alternativa)" },
+    { "type": "text", "id": "otro_titulo", "label": "Título", "default": "Ir al masajista" },
+    { "type": "text", "id": "otro_precio", "label": "Precio", "default": "Q250" },
+    { "type": "text", "id": "otro_precio_nota", "label": "Nota del precio", "default": "por cada sesión" },
+    { "type": "textarea", "id": "lista_otro", "label": "Puntos (uno por línea)", "default": "Tienes que sacar cita y trasladarte\nSolo cuando tienes tiempo libre\nEl gasto se repite cada vez\nNo te sirve en la oficina ni en el carro" },
+    { "type": "header", "content": "Columna 2 (tu producto)" },
+    { "type": "text", "id": "marca_etiqueta", "label": "Etiqueta", "default": "La opción inteligente" },
+    { "type": "text", "id": "marca_titulo", "label": "Título", "default": "Masajeador Alivia" },
+    { "type": "text", "id": "marca_precio", "label": "Precio", "default": "Q349" },
+    { "type": "text", "id": "marca_precio_nota", "label": "Nota del precio", "default": "una sola vez" },
+    { "type": "textarea", "id": "lista_marca", "label": "Puntos (uno por línea)", "default": "Masaje en casa, cuando quieras\nSesiones de 15 minutos todos los días\nToda la familia lo puede usar\nFunciona en casa, oficina y carro" },
+    { "type": "header", "content": "Barra de ahorro (cifra animada)" },
+    { "type": "text", "id": "ahorro_texto", "label": "Texto antes de la cifra", "default": "Con solo 1 masaje al mes ahorras más de" },
+    { "type": "text", "id": "ahorro_prefijo", "label": "Antes del número", "default": "Q" },
+    { "type": "range", "id": "ahorro_numero", "label": "Número", "min": 0, "max": 5000, "step": 50, "default": 2650 },
+    { "type": "text", "id": "ahorro_sufijo", "label": "Después del número", "default": "" },
+    { "type": "text", "id": "ahorro_texto_2", "label": "Texto después de la cifra", "default": "en un año" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "center" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 46 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 22, "step": 1, "unit": "px", "default": 16 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#F6F0E8" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "presets": [ { "name": "Alivia – Comparativa" } ]
+}
+{% endschema %}

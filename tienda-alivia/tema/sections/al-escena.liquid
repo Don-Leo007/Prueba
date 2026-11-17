@@ -1,0 +1,99 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign p = product
+  if p == blank and section.settings.producto_handle != blank
+    assign p = all_products[section.settings.producto_handle]
+  endif
+  if p == blank or p.id == blank
+    assign p = collections.all.products.first
+  endif
+  assign foto = section.settings.imagen
+  if foto == blank and p != blank and p.images.size > 1
+    assign foto = p.images[1]
+  endif
+-%}
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+    color: {{ section.settings.color_texto }};
+    --al-text: {{ section.settings.color_texto }};
+  }
+  #shopify-section-{{ section.id }} .al-escena__head { text-align: {{ section.settings.text_align }}; max-width: 760px; margin: 0 auto 48px; }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-step p { font-size: {{ section.settings.body_size }}px; }
+  #shopify-section-{{ section.id }} .al-eyebrow { color: {{ section.settings.color_acento }}; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="al-escena al-section" data-al-escena>
+  <div class="al-container">
+    <div class="al-escena__head al-reveal{% if section.settings.text_align == 'center' %} al-text-center{% endif %}">
+      {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+    </div>
+    <div class="al-escena__grid">
+      <div class="al-escena__visual al-reveal">
+        {%- if foto != blank -%}
+          {{ foto | image_url: width: 1200 | image_tag: loading: 'lazy', sizes: '(min-width: 990px) 50vw, 100vw', widths: '500, 800, 1200' }}
+        {%- else -%}
+          {% render 'al-ilustracion', tono: 'oscuro' %}
+        {%- endif -%}
+      </div>
+      <div class="al-escena__steps">
+        {%- for block in section.blocks -%}
+          <div class="al-step" {{ block.shopify_attributes }}>
+            <span class="al-step__num">{{ forloop.index }}</span>
+            <h3>{{ block.settings.titulo }}</h3>
+            <p>{{ block.settings.texto | newline_to_br }}</p>
+          </div>
+        {%- endfor -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – Cómo funciona",
+  "tag": "div",
+  "max_blocks": 6,
+  "settings": [
+    { "type": "text", "id": "producto_handle", "label": "Identificador del producto (handle)", "info": "Si no eliges imagen, se usa la 2.ª foto de este producto.", "default": "masajeador-shiatsu-alivia" },
+    { "type": "image_picker", "id": "imagen", "label": "Imagen (queda fija mientras se leen los pasos)" },
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "Así de fácil" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Tu masaje en 3 pasos" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "center" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 46 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 24, "step": 1, "unit": "px", "default": 17 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#12302F" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#FFFBF6" },
+    { "type": "color", "id": "color_acento", "label": "Acento", "default": "#8FD1C4" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 104 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 104 }
+  ],
+  "blocks": [
+    {
+      "type": "paso",
+      "name": "Paso",
+      "settings": [
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Paso" },
+        { "type": "textarea", "id": "texto", "label": "Texto", "default": "Describe el paso." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Alivia – Cómo funciona", "blocks": [ { "type": "paso" }, { "type": "paso" }, { "type": "paso" } ] }
+  ]
+}
+{% endschema %}

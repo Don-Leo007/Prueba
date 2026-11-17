@@ -1,0 +1,84 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_pagina }};
+  }
+  #shopify-section-{{ section.id }} .al-regalo__box {
+    background: linear-gradient(135deg, {{ section.settings.color_fondo }} 0%, {{ section.settings.color_fondo_2 }} 100%);
+    color: {{ section.settings.color_texto }};
+    text-align: {{ section.settings.text_align }};
+  }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-regalo__texto { font-size: {{ section.settings.body_size }}px; line-height: 1.6; margin-top: 14px; opacity: 0.9; }
+  #shopify-section-{{ section.id }} .al-eyebrow { color: inherit; opacity: 0.85; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+{%- assign ofertas = section.settings.ofertas | newline_to_br | split: '<br />' -%}
+<section class="al-regalo al-section" data-al-countdown-wrap data-al-hide-end="{{ section.settings.ocultar_al_terminar }}">
+  <div class="al-container">
+    <div class="al-regalo__box al-reveal">
+      <div style="position: relative; z-index: 1">
+        {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+        <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+        {%- if section.settings.texto != blank -%}<p class="al-regalo__texto">{{ section.settings.texto | newline_to_br }}</p>{%- endif -%}
+        <div class="al-regalo__oferta">
+          {%- for o in ofertas -%}{%- assign l = o | strip | strip_newlines -%}{%- if l != blank -%}<span>{{ l }}</span>{%- endif -%}{%- endfor -%}
+        </div>
+        {%- if section.settings.boton_texto != blank -%}
+          <div><a class="al-btn" href="{{ section.settings.boton_link | default: '#comprar' }}">{% render 'al-icon', nombre: 'regalo' %}{{ section.settings.boton_texto }}</a></div>
+        {%- endif -%}
+      </div>
+      {%- if section.settings.fecha_limite != blank -%}
+        <div>
+          <div class="al-countdown" data-al-countdown="{{ section.settings.fecha_limite | escape }}" role="timer" aria-label="{{ section.settings.nota_contador | escape }}">
+            <div class="al-countdown__cell"><b data-al-d>00</b><small>Días</small></div>
+            <div class="al-countdown__cell"><b data-al-h>00</b><small>Horas</small></div>
+            <div class="al-countdown__cell"><b data-al-m>00</b><small>Min</small></div>
+            <div class="al-countdown__cell"><b data-al-s>00</b><small>Seg</small></div>
+          </div>
+          {%- if section.settings.nota_contador != blank -%}<p class="al-regalo__nota">{{ section.settings.nota_contador }}</p>{%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – Navidad",
+  "tag": "div",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "🎄 Navidad 2026" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "El regalo que sí van a usar todos los días" },
+    { "type": "textarea", "id": "texto", "label": "Texto", "default": "Para mamá, papá, tu pareja o para ti. Llega en su caja, listo para envolver." },
+    { "type": "textarea", "id": "ofertas", "label": "Ofertas destacadas (una por línea)", "default": "1 unidad: Q349\n2 unidades: Q599 (ahorras Q99)" },
+    { "type": "text", "id": "boton_texto", "label": "Texto del botón", "default": "Regalar Alivia" },
+    { "type": "url", "id": "boton_link", "label": "Enlace del botón", "info": "Vacío = baja al formulario de compra (#comprar)." },
+    { "type": "header", "content": "Cuenta atrás" },
+    { "type": "text", "id": "fecha_limite", "label": "Fecha límite", "info": "Formato: AAAA-MM-DDTHH:MM:SS-06:00 (hora de Guatemala). Déjalo vacío para quitar el contador.", "default": "2026-12-19T23:59:00-06:00" },
+    { "type": "text", "id": "nota_contador", "label": "Texto bajo el contador", "default": "Pide antes de que termine el contador para recibirlo antes de Navidad" },
+    { "type": "checkbox", "id": "ocultar_al_terminar", "label": "Ocultar esta sección cuando llegue a cero", "default": true },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "left" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 24, "step": 1, "unit": "px", "default": 18 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_pagina", "label": "Fondo de la página", "default": "#FFFBF6" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo de la caja (inicio)", "default": "#C9573A" },
+    { "type": "color", "id": "color_fondo_2", "label": "Fondo de la caja (final)", "default": "#E8704F" },
+    { "type": "color", "id": "color_texto", "label": "Texto", "default": "#FFFFFF" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 80 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 80 }
+  ],
+  "presets": [ { "name": "Alivia – Navidad" } ]
+}
+{% endschema %}

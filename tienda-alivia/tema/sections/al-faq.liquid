@@ -1,0 +1,101 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-faq__head { text-align: {{ section.settings.text_align }}; }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-faq__item summary { font-size: {{ section.settings.question_size }}px; }
+  #shopify-section-{{ section.id }} .al-faq__answer { font-size: {{ section.settings.body_size }}px; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+{%- assign wa = section.settings.whatsapp | default: settings.al_whatsapp | remove: ' ' | remove: '+' | remove: '-' -%}
+<section class="al-faq al-section">
+  <div class="al-container al-faq__grid">
+    <div class="al-faq__head al-reveal">
+      {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+      {%- if wa != blank and section.settings.contacto_texto != blank -%}
+        <div class="al-faq__contacto">
+          <p>{{ section.settings.contacto_texto | newline_to_br }}</p>
+          <a class="al-btn" href="https://wa.me/{{ wa }}?text={{ section.settings.whatsapp_mensaje | url_encode }}" target="_blank" rel="noopener">{% render 'al-icon', nombre: 'whatsapp' %}{{ section.settings.contacto_boton }}</a>
+        </div>
+      {%- endif -%}
+    </div>
+    <div class="al-faq__list">
+      {%- for block in section.blocks -%}
+        <details class="al-faq__item al-reveal" style="--al-i: {{ forloop.index0 | modulo: 5 }}" {% if forloop.first and section.settings.abrir_primera %}open{% endif %} {{ block.shopify_attributes }}>
+          <summary>{{ block.settings.pregunta }}</summary>
+          <div class="al-faq__answer">{{ block.settings.respuesta }}</div>
+        </details>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{%- if section.blocks.size > 0 -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- for block in section.blocks -%}
+    {
+      "@type": "Question",
+      "name": {{ block.settings.pregunta | strip_html | json }},
+      "acceptedAnswer": { "@type": "Answer", "text": {{ block.settings.respuesta | strip_html | json }} }
+    }{% unless forloop.last %},{% endunless %}
+    {%- endfor -%}
+  ]
+}
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Alivia – Preguntas",
+  "tag": "div",
+  "max_blocks": 16,
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "Resolvemos tus dudas" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Preguntas frecuentes" },
+    { "type": "checkbox", "id": "abrir_primera", "label": "Mostrar la primera pregunta abierta", "default": true },
+    { "type": "header", "content": "Caja de WhatsApp" },
+    { "type": "text", "id": "whatsapp", "label": "Número de WhatsApp (opcional)", "info": "Con código de país, sin espacios. Ej: 50212345678. Si lo dejas vacío se usa el de Configuración del tema → Alivia." },
+    { "type": "textarea", "id": "contacto_texto", "label": "Texto", "default": "¿Tienes otra pregunta? Escríbenos y te respondemos en minutos." },
+    { "type": "text", "id": "contacto_boton", "label": "Texto del botón", "default": "Escribir por WhatsApp" },
+    { "type": "text", "id": "whatsapp_mensaje", "label": "Mensaje que se escribe solo", "default": "Hola, tengo una pregunta sobre el masajeador Alivia" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "left" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "question_size", "label": "Tamaño de las preguntas (px)", "min": 14, "max": 24, "step": 1, "unit": "px", "default": 17 },
+    { "type": "range", "id": "body_size", "label": "Tamaño de las respuestas (px)", "min": 13, "max": 22, "step": 1, "unit": "px", "default": 16 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#F6F0E8" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "pregunta",
+      "name": "Pregunta",
+      "settings": [
+        { "type": "text", "id": "pregunta", "label": "Pregunta", "default": "¿Pregunta?" },
+        { "type": "richtext", "id": "respuesta", "label": "Respuesta", "default": "<p>Respuesta.</p>" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Alivia – Preguntas", "blocks": [ { "type": "pregunta" }, { "type": "pregunta" }, { "type": "pregunta" } ] }
+  ]
+}
+{% endschema %}

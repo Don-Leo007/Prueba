@@ -1,0 +1,247 @@
+{
+  "sections": {
+    "main": {
+      "type": "al-producto",
+      "settings": {}
+    },
+    "cinta": {
+      "type": "al-marquee",
+      "settings": {}
+    },
+    "problema": {
+      "type": "al-problema",
+      "settings": {}
+    },
+    "beneficios": {
+      "type": "al-beneficios",
+      "blocks": {
+        "b1": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "🤲",
+            "titulo": "Amasado shiatsu 3D",
+            "texto": "8 cabezales giratorios que imitan las manos de un masajista y llegan a los nudos de tensión."
+          }
+        },
+        "b2": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "🔥",
+            "titulo": "Calor relajante",
+            "texto": "Calor suave que ayuda a relajar los músculos. Lo enciendes o apagas con un botón."
+          }
+        },
+        "b3": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "🎚️",
+            "titulo": "Tú controlas la presión",
+            "texto": "3 intensidades y cambio de dirección. Con las asas decides qué tan profundo lo quieres."
+          }
+        },
+        "b4": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "🚗",
+            "titulo": "En casa, oficina o carro",
+            "texto": "Incluye adaptador para casa y para el carro. Úsalo en el sofá, en tu escritorio o esperando en el tráfico."
+          }
+        },
+        "b5": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "⏱️",
+            "titulo": "Apagado automático",
+            "texto": "Sesiones de 15 minutos y se apaga solo. Puedes relajarte (o dormirte) sin preocuparte."
+          }
+        },
+        "b6": {
+          "type": "beneficio",
+          "settings": {
+            "emoji": "👨‍👩‍👧",
+            "titulo": "Para toda la familia",
+            "texto": "Cuello, hombros, espalda, cintura, piernas y pantorrillas. Un regalo que usa toda la casa."
+          }
+        }
+      },
+      "block_order": [
+        "b1",
+        "b2",
+        "b3",
+        "b4",
+        "b5",
+        "b6"
+      ],
+      "settings": {}
+    },
+    "como-funciona": {
+      "type": "al-escena",
+      "blocks": {
+        "p1": {
+          "type": "paso",
+          "settings": {
+            "titulo": "Colócalo",
+            "texto": "Ponlo sobre tu cuello, hombros o la zona que quieras masajear. Se adapta a tu cuerpo."
+          }
+        },
+        "p2": {
+          "type": "paso",
+          "settings": {
+            "titulo": "Ajusta la presión",
+            "texto": "Pasa los brazos por las asas: entre más las bajes, más profundo el masaje."
+          }
+        },
+        "p3": {
+          "type": "paso",
+          "settings": {
+            "titulo": "Relájate 15 minutos",
+            "texto": "Enciende el calor, elige la intensidad y disfruta. Se apaga solo al terminar."
+          }
+        }
+      },
+      "block_order": [
+        "p1",
+        "p2",
+        "p3"
+      ],
+      "settings": {}
+    },
+    "comparativa": {
+      "type": "al-comparativa",
+      "settings": {}
+    },
+    "regalo": {
+      "type": "al-regalo",
+      "settings": {}
+    },
+    "garantias": {
+      "type": "al-garantia",
+      "blocks": {
+        "g1": {
+          "type": "garantia",
+          "settings": {
+            "icono": "efectivo",
+            "titulo": "Pagas al recibir",
+            "texto": "No adelantas nada. Pagas en efectivo cuando el repartidor te lo entrega."
+          }
+        },
+        "g2": {
+          "type": "garantia",
+          "settings": {
+            "icono": "envio",
+            "titulo": "Envío gratis",
+            "texto": "A los 22 departamentos. Capital 1–3 días hábiles, departamentos 2–5."
+          }
+        },
+        "g3": {
+          "type": "garantia",
+          "settings": {
+            "icono": "garantia",
+            "titulo": "30 días de garantía",
+            "texto": "Si llega con un defecto de fábrica, te lo cambiamos sin costo."
+          }
+        },
+        "g4": {
+          "type": "garantia",
+          "settings": {
+            "icono": "whatsapp",
+            "titulo": "Atención por WhatsApp",
+            "texto": "Te confirmamos tu pedido y resolvemos tus dudas por WhatsApp."
+          }
+        }
+      },
+      "block_order": [
+        "g1",
+        "g2",
+        "g3",
+        "g4"
+      ],
+      "settings": {}
+    },
+    "opiniones": {
+      "type": "al-resenas",
+      "settings": {}
+    },
+    "faq": {
+      "type": "al-faq",
+      "blocks": {
+        "q1": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Cómo pago mi pedido?",
+            "respuesta": "<p><strong>Pagas en efectivo cuando lo recibes</strong> (pago contra entrega). Si prefieres, también puedes pagar por transferencia o depósito bancario. No te pedimos datos de tarjeta.</p>"
+          }
+        },
+        "q2": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Cuánto tarda en llegar?",
+            "respuesta": "<p>Ciudad de Guatemala: de 1 a 3 días hábiles. Departamentos: de 2 a 5 días hábiles. Te escribimos por WhatsApp para confirmar tu dirección antes de enviarlo.</p>"
+          }
+        },
+        "q3": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿El envío tiene costo?",
+            "respuesta": "<p>No. El envío es <strong>gratis a toda Guatemala</strong>. El precio que ves es el precio final.</p>"
+          }
+        },
+        "q4": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Y si llega dañado o no funciona?",
+            "respuesta": "<p>Tienes <strong>30 días de garantía</strong> por defectos de fábrica. Escríbenos por WhatsApp con una foto o video y te lo cambiamos sin costo.</p>"
+          }
+        },
+        "q5": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Lo puedo usar en el carro?",
+            "respuesta": "<p>Sí. Incluye adaptador para el carro además del cargador para casa. Por seguridad, úsalo solo como pasajero o con el carro detenido.</p>"
+          }
+        },
+        "q6": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Es seguro? ¿Cuánto tiempo lo puedo usar?",
+            "respuesta": "<p>Recomendamos sesiones de 15 minutos (se apaga solo). No lo uses sobre heridas o inflamación. Si estás embarazada, tienes marcapasos o alguna condición médica, consulta antes con tu médico. Es un producto de relajación, no un tratamiento médico.</p>"
+          }
+        },
+        "q7": {
+          "type": "pregunta",
+          "settings": {
+            "pregunta": "¿Sirve como regalo?",
+            "respuesta": "<p>¡Es de los regalos favoritos! Llega en su caja original, listo para envolver. Llévate 2 por Q599 y ahorra Q99.</p>"
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6",
+        "q7"
+      ],
+      "settings": {}
+    },
+    "llamada-final": {
+      "type": "al-cta-final",
+      "settings": {}
+    }
+  },
+  "order": [
+    "main",
+    "cinta",
+    "problema",
+    "beneficios",
+    "como-funciona",
+    "comparativa",
+    "regalo",
+    "garantias",
+    "opiniones",
+    "faq",
+    "llamada-final"
+  ]
+}

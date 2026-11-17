@@ -1,0 +1,77 @@
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-garantia__head { text-align: {{ section.settings.text_align }}; max-width: 720px; margin: 0 auto; }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-garantia__intro { font-size: {{ section.settings.body_size }}px; line-height: 1.6; margin-top: 14px; }
+  #shopify-section-{{ section.id }} .al-garantia__grid { --al-cols: {{ section.settings.columnas }}; --al-icon: 52px; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} { padding-top: {{ section.settings.padding_top | times: 0.65 | round }}px; padding-bottom: {{ section.settings.padding_bottom | times: 0.65 | round }}px; }
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="al-garantia al-section">
+  <div class="al-container">
+    <div class="al-garantia__head al-reveal">
+      {%- if section.settings.sello_numero != blank -%}
+        <div class="al-sello" aria-hidden="true"><div><b>{{ section.settings.sello_numero }}</b><small>{{ section.settings.sello_texto }}</small></div></div>
+      {%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+      {%- if section.settings.intro != blank -%}<p class="al-garantia__intro al-muted">{{ section.settings.intro | newline_to_br }}</p>{%- endif -%}
+    </div>
+    <div class="al-garantia__grid">
+      {%- for block in section.blocks -%}
+        <div class="al-garantia__item al-reveal" style="--al-i: {{ forloop.index0 }}" {{ block.shopify_attributes }}>
+          <div class="al-card__icon" style="color: var(--al-teal)">{% render 'al-icon', nombre: block.settings.icono %}</div>
+          <h3>{{ block.settings.titulo }}</h3>
+          <p>{{ block.settings.texto | newline_to_br }}</p>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Alivia – Garantías",
+  "tag": "div",
+  "max_blocks": 8,
+  "settings": [
+    { "type": "text", "id": "sello_numero", "label": "Sello – número", "default": "30" },
+    { "type": "text", "id": "sello_texto", "label": "Sello – texto", "default": "días de garantía" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Compra sin riesgo" },
+    { "type": "textarea", "id": "intro", "label": "Texto", "default": "No pagas nada por adelantado. Lo revisas al recibirlo y, si tiene cualquier defecto de fábrica en los primeros 30 días, te lo cambiamos." },
+    { "type": "range", "id": "columnas", "label": "Columnas en computadora", "min": 2, "max": 4, "step": 1, "default": 4 },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "center" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 24, "step": 1, "unit": "px", "default": 18 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#FFFBF6" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "garantia",
+      "name": "Garantía",
+      "settings": [
+        { "type": "select", "id": "icono", "label": "Icono", "options": [ { "value": "efectivo", "label": "Billete" }, { "value": "envio", "label": "Camión" }, { "value": "garantia", "label": "Escudo" }, { "value": "whatsapp", "label": "WhatsApp" }, { "value": "devolucion", "label": "Devolución" }, { "value": "candado", "label": "Candado" }, { "value": "reloj", "label": "Reloj" }, { "value": "regalo", "label": "Regalo" }, { "value": "corazon", "label": "Corazón" } ], "default": "garantia" },
+        { "type": "text", "id": "titulo", "label": "Título", "default": "Garantía" },
+        { "type": "textarea", "id": "texto", "label": "Texto", "default": "Explica la garantía." }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Alivia – Garantías", "blocks": [ { "type": "garantia" }, { "type": "garantia" }, { "type": "garantia" }, { "type": "garantia" } ] }
+  ]
+}
+{% endschema %}

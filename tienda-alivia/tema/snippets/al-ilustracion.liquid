@@ -1,0 +1,43 @@
+{%- comment -%}
+  Ilustración del masajeador de cuello (se muestra mientras no haya fotos del producto).
+  Uso: {% render 'al-ilustracion', tono: 'claro' %}  (tono: claro | oscuro)
+{%- endcomment -%}
+{%- if tono == 'oscuro' -%}
+  {%- assign c_cuerpo = '#2f7a74' -%}{%- assign c_sombra = '#174a47' -%}{%- assign c_nodo = '#f6f0e8' -%}{%- assign c_calor = '#ffb59e' -%}{%- assign c_correa = '#8fd1c4' -%}
+{%- else -%}
+  {%- assign c_cuerpo = '#1f5f5b' -%}{%- assign c_sombra = '#12302f' -%}{%- assign c_nodo = '#f6f0e8' -%}{%- assign c_calor = '#e8704f' -%}{%- assign c_correa = '#2f7a74' -%}
+{%- endif -%}
+<svg class="al-ilus" viewBox="0 0 400 400" role="img" aria-label="Ilustración del masajeador de cuello Alivia">
+  <defs>
+    <radialGradient id="al-calor-{{ tono }}" cx="0.5" cy="0.62" r="0.5">
+      <stop offset="0" stop-color="#ffd2c4" stop-opacity="0.95"/>
+      <stop offset="1" stop-color="{{ c_calor }}" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="200" cy="352" rx="150" ry="16" fill="#12302f" opacity="0.13"/>
+  {%- comment -%} Brillo de calor {%- endcomment -%}
+  <ellipse cx="200" cy="222" rx="96" ry="78" fill="url(#al-calor-{{ tono }})" opacity="0.55"/>
+  {%- comment -%} Cuerpo en forma de U (vista desde arriba) {%- endcomment -%}
+  <path d="M95 300 V205 a105 105 0 0 1 210 0 V300" fill="none" stroke="{{ c_sombra }}" stroke-width="78" stroke-linecap="round" transform="translate(0 8)" opacity="0.35"/>
+  <path d="M95 300 V205 a105 105 0 0 1 210 0 V300" fill="none" stroke="{{ c_cuerpo }}" stroke-width="78" stroke-linecap="round"/>
+  <path d="M95 300 V205 a105 105 0 0 1 210 0 V300" fill="none" stroke="#ffffff" stroke-opacity="0.12" stroke-width="44" stroke-linecap="round"/>
+  {%- comment -%} Asas para los brazos {%- endcomment -%}
+  <path d="M62 300 q-34 40 0 62 q30 14 52 -18" fill="none" stroke="{{ c_correa }}" stroke-width="12" stroke-linecap="round"/>
+  <path d="M338 300 q34 40 0 62 q-30 14 -52 -18" fill="none" stroke="{{ c_correa }}" stroke-width="12" stroke-linecap="round"/>
+  {%- comment -%} Nodos de masaje en la curva interior {%- endcomment -%}
+  <circle class="al-ilus__nodo" cx="140" cy="214" r="17" fill="{{ c_nodo }}"/>
+  <circle class="al-ilus__nodo" cx="171" cy="163" r="17" fill="{{ c_nodo }}"/>
+  <circle class="al-ilus__nodo" cx="229" cy="163" r="17" fill="{{ c_nodo }}"/>
+  <circle class="al-ilus__nodo" cx="260" cy="214" r="17" fill="{{ c_nodo }}"/>
+  {%- comment -%} Panel de botones {%- endcomment -%}
+  <rect x="174" y="92" width="52" height="18" rx="9" fill="{{ c_nodo }}"/>
+  <circle cx="187" cy="101" r="4" fill="{{ c_calor }}"/>
+  <circle cx="200" cy="101" r="4" fill="{{ c_cuerpo }}"/>
+  <circle cx="213" cy="101" r="4" fill="{{ c_cuerpo }}"/>
+  {%- comment -%} Ondas de calor {%- endcomment -%}
+  <g>
+    <path class="al-ilus__calor" d="M170 250c-8 10 8 18 0 28" stroke="{{ c_calor }}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path class="al-ilus__calor" d="M200 240c-8 10 8 18 0 28" stroke="{{ c_calor }}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path class="al-ilus__calor" d="M230 250c-8 10 8 18 0 28" stroke="{{ c_calor }}" stroke-width="5" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>

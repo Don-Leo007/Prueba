@@ -1,0 +1,81 @@
+{%- comment -%}
+  Reseñas de clientes. IMPORTANTE: añade solo opiniones REALES de tus clientes.
+  Si no hay ninguna reseña añadida, la sección no se muestra en la tienda.
+{%- endcomment -%}
+{%- if section.blocks.size > 0 -%}
+{{ 'al-styles.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'al-scripts.js' | asset_url }}" defer="defer"></script>
+
+{% style %}
+  #shopify-section-{{ section.id }} {
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+    background: {{ section.settings.color_fondo }};
+  }
+  #shopify-section-{{ section.id }} .al-resenas__head { text-align: {{ section.settings.text_align }}; }
+  #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size }}px; }
+  #shopify-section-{{ section.id }} .al-resena p { font-size: {{ section.settings.body_size }}px; line-height: 1.6; }
+  @media screen and (max-width: 749px) {
+    #shopify-section-{{ section.id }} .al-h2 { font-size: {{ section.settings.heading_size | times: 0.75 | round }}px; }
+  }
+{% endstyle %}
+
+<section class="al-resenas al-section">
+  <div class="al-container">
+    <div class="al-resenas__head al-reveal{% if section.settings.text_align == 'center' %} al-text-center{% endif %}">
+      {%- if section.settings.eyebrow != blank -%}<p class="al-eyebrow">{{ section.settings.eyebrow }}</p>{%- endif -%}
+      <h2 class="al-h2">{{ section.settings.titulo }}</h2>
+    </div>
+    <div class="al-resenas__grid">
+      {%- for block in section.blocks -%}
+        <figure class="al-resena al-reveal" style="--al-i: {{ forloop.index0 | modulo: 3 }}; margin: 0" {{ block.shopify_attributes }}>
+          {%- if block.settings.foto != blank -%}
+            <div class="al-resena__foto">{{ block.settings.foto | image_url: width: 700 | image_tag: loading: 'lazy' }}</div>
+          {%- endif -%}
+          <div class="al-resena__stars" aria-label="{{ block.settings.estrellas }} de 5 estrellas">
+            {%- for i in (1..block.settings.estrellas) -%}★{%- endfor -%}
+          </div>
+          <blockquote style="margin: 0"><p>{{ block.settings.texto | newline_to_br }}</p></blockquote>
+          <figcaption class="al-resena__autor">{{ block.settings.nombre }}<small>{{ block.settings.lugar }}</small></figcaption>
+        </figure>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Alivia – Opiniones",
+  "tag": "div",
+  "max_blocks": 12,
+  "settings": [
+    { "type": "paragraph", "content": "Añade aquí SOLO opiniones reales de tus clientes (pídeles una foto y su permiso por WhatsApp). Mientras no añadas ninguna, esta sección no se ve en la tienda." },
+    { "type": "text", "id": "eyebrow", "label": "Texto pequeño sobre el título", "default": "Lo que dicen nuestros clientes" },
+    { "type": "text", "id": "titulo", "label": "Título", "default": "Clientes que ya se relajan con Alivia" },
+    { "type": "header", "content": "Tipografía" },
+    { "type": "select", "id": "text_align", "label": "Alineación del título", "options": [ { "value": "left", "label": "Izquierda" }, { "value": "center", "label": "Centro" }, { "value": "right", "label": "Derecha" } ], "default": "center" },
+    { "type": "range", "id": "heading_size", "label": "Tamaño del título (px)", "min": 22, "max": 72, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "body_size", "label": "Tamaño del texto (px)", "min": 13, "max": 22, "step": 1, "unit": "px", "default": 16 },
+    { "type": "header", "content": "Colores" },
+    { "type": "color", "id": "color_fondo", "label": "Fondo", "default": "#FFFBF6" },
+    { "type": "header", "content": "Espaciado" },
+    { "type": "range", "id": "padding_top", "label": "Espacio superior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 },
+    { "type": "range", "id": "padding_bottom", "label": "Espacio inferior (px)", "min": 0, "max": 160, "step": 8, "unit": "px", "default": 96 }
+  ],
+  "blocks": [
+    {
+      "type": "resena",
+      "name": "Opinión",
+      "settings": [
+        { "type": "image_picker", "id": "foto", "label": "Foto del cliente con el producto (opcional)" },
+        { "type": "range", "id": "estrellas", "label": "Estrellas", "min": 1, "max": 5, "step": 1, "default": 5 },
+        { "type": "textarea", "id": "texto", "label": "Lo que dijo el cliente" },
+        { "type": "text", "id": "nombre", "label": "Nombre (con su permiso)" },
+        { "type": "text", "id": "lugar", "label": "Ciudad o departamento" }
+      ]
+    }
+  ],
+  "presets": [ { "name": "Alivia – Opiniones" } ]
+}
+{% endschema %}
